@@ -1,0 +1,8 @@
+namespace Example;
+
+table Message {
+  text: string;
+  id: int;
+}
+
+root_type Message;

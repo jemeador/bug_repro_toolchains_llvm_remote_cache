@@ -1,0 +1,93 @@
+module(
+    name = "llvm_toolchain_test",
+    version = "0.0.1",
+)
+
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "rules_cc", version = "0.2.14")
+bazel_dep(name = "tar.bzl", version = "0.10.4")
+bazel_dep(name = "toolchains_llvm", version = "1.6.0")
+bazel_dep(name = "flatbuffers", version = "25.2.10")
+
+# LLVM Toolchain setup (start)
+# Hermetic BSD tar toolchain — provides $(BSDTAR_BIN) for genrules that need
+# to (re)compress archives without depending on host-installed xz / gzip.
+tar = use_extension("@tar.bzl//tar:extensions.bzl", "toolchains")
+use_repo(tar, "bsd_tar_toolchains")
+register_toolchains("@bsd_tar_toolchains//:all")
+
+# The below llvm toolchain setup is modeled after [https://github.com/bazel-contrib/toolchains_llvm/blob/master/tests/MODULE.bazel]
+llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
+
+LLVM_VERSIONS = {
+    "": "19.1.7",
+}
+
+# Toolchain for native host builds (Linux x86_64, macOS ARM64) and cross-compilation
+# to the drone target (Linux aarch64).
+#
+# macOS ARM64 notes:
+#   - No llvm.sysroot entry for darwin: Apple prohibits redistributing the Xcode SDK,
+#     so there is no downloadable hermetic sysroot. toolchains_llvm calls
+#     `xcrun --sdk macosx --show-sdk-path` at build time to locate the locally
+#     installed Xcode/CLT SDK automatically. macOS builds therefore require Xcode
+#     Command Line Tools to be installed, but need no extra configuration here.
+#   - No stdlib entry for darwin: omitting it falls back to toolchains_llvm's default
+#     "builtin-libc++", which links libc++ dynamically from the Xcode SDK. This is
+#     the correct behavior on macOS and avoids the arch-specific libc++ header
+#     issues that affect the Linux cross-compilation case.
+llvm.toolchain(
+    name = "llvm_toolchain_with_sysroot",
+    cxx_standard = {"": "c++20"},
+    stdlib = {
+        # Linux x86_64 (exec host on Linux): use static libc++ bundled with LLVM
+        "linux-x86_64": "libc++",
+        # aarch64 cross: libc++ __config_site is arch-specific and not
+        # present in the x86_64 LLVM distribution; use dynamic libstdc++
+        # from the sysroot (Bullseye ships libstdc++.so but not libstdc++.a)
+        "linux-aarch64": "dynamic-stdc++",
+        # darwin: intentionally omitted — toolchains_llvm defaults to "builtin-libc++",
+        # which links libc++ dynamically from the Xcode SDK located via xcrun.
+        # See the llvm.toolchain comment above for the full explanation.
+    },
+    llvm_versions = LLVM_VERSIONS,
+)
+
+# Hermetic sysroots for Linux targets. No darwin entry — see llvm.toolchain comment above.
+llvm.sysroot(
+    name = "llvm_toolchain_with_sysroot",
+    label = "@org_chromium_sysroot_linux_x64//sysroot",
+    targets = ["linux-x86_64"],
+)
+llvm.sysroot(
+    name = "llvm_toolchain_with_sysroot",
+    label = "@org_chromium_sysroot_linux_arm64//sysroot",
+    targets = ["linux-aarch64"],
+)
+use_repo(llvm, "llvm_toolchain_with_sysroot")
+
+register_toolchains("@llvm_toolchain_with_sysroot//:all")
+
+sysroot = use_repo_rule("@toolchains_llvm//toolchain:sysroot.bzl", "sysroot")
+
+# This sysroot is used by github.com/vsco/bazel-toolchains.
+# URL format: base_url/{sha256sum} (Chromium sysroot new format, debian_bullseye_amd64)
+# See: https://chromium.googlesource.com/chromium/src/+/HEAD/build/linux/sysroot_scripts/sysroots.json
+sysroot(
+    name = "org_chromium_sysroot_linux_x64",
+    sha256 = "52d61d4446ffebfaa3dda2cd02da4ab4876ff237853f46d273e7f9b666652e1d",
+    urls = [
+        "https://commondatastorage.googleapis.com/chrome-linux-sysroot/52d61d4446ffebfaa3dda2cd02da4ab4876ff237853f46d273e7f9b666652e1d",
+    ],
+)
+
+# Debian Bullseye ARM64 sysroot for cross-compilation
+# See: https://chromium.googlesource.com/chromium/src/+/HEAD/build/linux/sysroot_scripts/sysroots.json
+sysroot(
+    name = "org_chromium_sysroot_linux_arm64",
+    sha256 = "c7176a4c7aacbf46bda58a029f39f79a68008d3dee6518f154dcf5161a5486d8",
+    urls = [
+        "https://commondatastorage.googleapis.com/chrome-linux-sysroot/c7176a4c7aacbf46bda58a029f39f79a68008d3dee6518f154dcf5161a5486d8",
+    ],
+)
+# LLVM Toolchain setup (end)

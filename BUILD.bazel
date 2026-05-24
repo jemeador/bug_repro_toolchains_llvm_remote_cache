@@ -1,0 +1,12 @@
+load("@flatbuffers//:build_defs.bzl", "flatbuffer_cc_library")
+
+flatbuffer_cc_library(
+    name = "message_fbs",
+    srcs = ["message.fbs"],
+)
+
+cc_binary(
+    name = "app",
+    srcs = ["main.cc"],
+    deps = [":message_fbs"],
+)

@@ -1,0 +1,17 @@
+This repo reproduces an issue when using toolchains_llvm 1.6.0 with a remote_cache
+
+````
+bazel build ...
+bazel shutdown
+bazel build ...
+````
+
+Bazel rebuilds all targets.
+
+Now, if you remove this line from the .bazelrc:
+
+````
+build --remote_cache=http://127.0.0.1:404
+````
+
+Doing the above will not result in a rebuild. All targets are foud in thea action cache.

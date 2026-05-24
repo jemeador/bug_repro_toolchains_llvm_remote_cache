@@ -1,0 +1,132 @@
+# -----------------------------------------------------------------------------
+# Operating System — macOS
+# -----------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+
+# -----------------------------------------------------------------------------
+# Operating System — Windows
+# -----------------------------------------------------------------------------
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+[Dd]esktop.ini
+
+# -----------------------------------------------------------------------------
+# Operating System — Linux
+# -----------------------------------------------------------------------------
+*~
+.fuse_hidden*
+.Trash-*
+.nfs*
+
+# -----------------------------------------------------------------------------
+# Editors & IDEs
+# -----------------------------------------------------------------------------
+
+# VS Code (user-specific state; commit .vscode/extensions.json and tasks if desired)
+.vscode/
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
+
+# JetBrains (CLion, IntelliJ, WebStorm, etc.)
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Vim / Neovim
+*.swp
+*.swo
+*.swn
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+Session.vim
+.netrwhist
+
+# Emacs
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.project
+.classpath
+.settings/
+.metadata/
+
+# -----------------------------------------------------------------------------
+# Secrets & Credentials (never commit these)
+# -----------------------------------------------------------------------------
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+.env
+.env.*
+!.env.example
+!.env.template
+secrets/
+.secrets
+credentials.json
+service-account*.json
+
+# -----------------------------------------------------------------------------
+# Temporary & Scratch Files
+# -----------------------------------------------------------------------------
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.rej
+scratch/
+__pycache__/
+tmp/
+
+# -----------------------------------------------------------------------------
+# Captured Frames & Output (never commit binary image data)
+# -----------------------------------------------------------------------------
+frames/
+output_frames/
+
+# -----------------------------------------------------------------------------
+# Bazel Output Symlinks (never commit build cache references)
+# -----------------------------------------------------------------------------
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-*/
+
+# -----------------------------------------------------------------------------
+# Node.js
+# -----------------------------------------------------------------------------
+node_modules/
+
+# -----------------------------------------------------------------------------
+# Agent/LLM runtime state (auto-generated skill libraries, session caches)
+# -----------------------------------------------------------------------------
+.agent/
+.circleci/continue.yml
