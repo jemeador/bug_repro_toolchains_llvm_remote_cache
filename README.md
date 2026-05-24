@@ -1,9 +1,11 @@
-This repo reproduces an issue when using toolchains_llvm 1.6.0 with a
-p> k
-remote_cache. Bazel rebuilds unnecesarily after a restarting the bazel server
-when it could use the action cache.
+This repo reproduces an issue on Bazel 8.5.1 when using `toolchains_llvm` 1.6.0
+with a `remote_cache`. Bazel rebuilds unnecesarily after a restarting the bazel
+server when it could use the action cache.
 
-To reproduce the issue: build, then shutdown, then rebuild. Bazel will rebuild targets that require the llvm toolchain.
+To reproduce the issue: build, then shutdown, then rebuild. Bazel will rebuild
+targets that require the llvm toolchain. Note that this happens even if you
+have a functional remote cache, but the one configured here just uses a
+non-existant one on port 404.
 
 ````
 $ bazel clean
