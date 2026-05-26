@@ -1,0 +1,12 @@
+--- a/toolchain/sysroot.bzl
++++ b/toolchain/sysroot.bzl
+@@ -26,7 +26,7 @@
+     rctx.file(
+         "sysroot/BUILD.bazel",
+         """filegroup(
+     name = "sysroot",
+-    srcs = ["."],
++    srcs = glob(["*/**"], exclude = ["lib/systemd/**"]),
+     visibility = ["//visibility:public"],
+ )""",
+     )

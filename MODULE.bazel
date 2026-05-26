@@ -9,6 +9,15 @@ bazel_dep(name = "tar.bzl", version = "0.10.4")
 bazel_dep(name = "toolchains_llvm", version = "1.6.0")
 bazel_dep(name = "flatbuffers", version = "25.2.10")
 
+archive_override(
+    module_name = "toolchains_llvm",
+    urls = ["https://github.com/bazel-contrib/toolchains_llvm/archive/refs/tags/v1.6.0.tar.gz"],
+    strip_prefix = "toolchains_llvm-1.6.0",
+    integrity = "sha256-k+zblaA77LsL1AvHw+Wt89BE/nm+XCbSF2XAmG0yfZ0=",
+    patches = ["//patches:sysroot_glob.patch"],
+    patch_strip = 1,
+)
+
 # LLVM Toolchain setup (start)
 # Hermetic BSD tar toolchain — provides $(BSDTAR_BIN) for genrules that need
 # to (re)compress archives without depending on host-installed xz / gzip.
