@@ -56,38 +56,60 @@ llvm.toolchain(
 # Hermetic sysroots for Linux targets. No darwin entry — see llvm.toolchain comment above.
 llvm.sysroot(
     name = "llvm_toolchain_with_sysroot",
-    label = "@org_chromium_sysroot_linux_x64//sysroot",
+    label = "@org_chromium_sysroot_linux_x64//:sysroot",
     targets = ["linux-x86_64"],
 )
 llvm.sysroot(
     name = "llvm_toolchain_with_sysroot",
-    label = "@org_chromium_sysroot_linux_arm64//sysroot",
+    label = "@org_chromium_sysroot_linux_arm64//:sysroot",
     targets = ["linux-aarch64"],
 )
 use_repo(llvm, "llvm_toolchain_with_sysroot")
 
 register_toolchains("@llvm_toolchain_with_sysroot//:all")
 
-sysroot = use_repo_rule("@toolchains_llvm//toolchain:sysroot.bzl", "sysroot")
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # This sysroot is used by github.com/vsco/bazel-toolchains.
 # URL format: base_url/{sha256sum} (Chromium sysroot new format, debian_bullseye_amd64)
 # See: https://chromium.googlesource.com/chromium/src/+/HEAD/build/linux/sysroot_scripts/sysroots.json
-sysroot(
+http_archive(
     name = "org_chromium_sysroot_linux_x64",
     sha256 = "52d61d4446ffebfaa3dda2cd02da4ab4876ff237853f46d273e7f9b666652e1d",
     urls = [
         "https://commondatastorage.googleapis.com/chrome-linux-sysroot/52d61d4446ffebfaa3dda2cd02da4ab4876ff237853f46d273e7f9b666652e1d",
     ],
+    type = "tar.xz",
+    build_file_content = """
+filegroup(
+    name = "sysroot",
+    srcs = glob(
+        ["**"],
+        exclude = ["lib/systemd/**"],
+    ),
+    visibility = ["//visibility:public"],
+)
+""",
 )
 
 # Debian Bullseye ARM64 sysroot for cross-compilation
 # See: https://chromium.googlesource.com/chromium/src/+/HEAD/build/linux/sysroot_scripts/sysroots.json
-sysroot(
+http_archive(
     name = "org_chromium_sysroot_linux_arm64",
     sha256 = "c7176a4c7aacbf46bda58a029f39f79a68008d3dee6518f154dcf5161a5486d8",
     urls = [
         "https://commondatastorage.googleapis.com/chrome-linux-sysroot/c7176a4c7aacbf46bda58a029f39f79a68008d3dee6518f154dcf5161a5486d8",
     ],
+    type = "tar.xz",
+    build_file_content = """
+filegroup(
+    name = "sysroot",
+    srcs = glob(
+        ["**"],
+        exclude = ["lib/systemd/**"],
+    ),
+    visibility = ["//visibility:public"],
+)
+""",
 )
 # LLVM Toolchain setup (end)
